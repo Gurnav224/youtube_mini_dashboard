@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Unlisted Videos Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        .login-container {
+            text-align: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #c4302b;
+            margin-bottom: 30px;
+        }
+        p {
+            margin-bottom: 30px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .google-btn {
+            background-color: #c4302b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        .google-btn:hover {
+            background-color: #a52521;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" alt="YouTube Logo" class="logo">
+        <h1>YouTube Unlisted Videos Finder</h1>
+        <p>Sign in with your Google account to find and manage your unlisted YouTube videos.</p>
+        <a href="/auth/google" class="google-btn">Sign in with Google</a>
+    </div>
+</body>
+</html>

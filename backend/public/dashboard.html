@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - YouTube Unlisted Videos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #c4302b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 40px;
+            margin-right: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .user-info a:hover {
+            text-decoration: underline;
+        }
+        main {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background-color: #c4302b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .refresh-btn:hover {
+            background-color: #a52521;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        .video-count {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #555;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .video-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            overflow: hidden;
+        }
+        .thumbnail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .video-info {
+            padding: 15px;
+        }
+        .video-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 2.8rem;
+        }
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+        .video-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .video-link {
+            color: #c4302b;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border: 1px solid #c4302b;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .video-link:hover {
+            background-color: #c4302b;
+            color: white;
+        }
+        .no-videos {
+            text-align: center;
+            padding: 50px 0;
+            color: #666;
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #c4302b;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" alt="YouTube Logo" class="logo">
+            <h1>YouTube Unlisted Videos Dashboard</h1>
+        </div>
+        <div class="user-info">
+            <span id="channel-name">Loading...</span>
+            <a href="/">Sign Out</a>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard-header">
+            <h2>Your Unlisted Videos</h2>
+            <button id="refresh-btn" class="refresh-btn">Refresh Videos</button>
+        </div>
+
+        <div id="status" class="status loading" style="display: none;">Loading your videos...</div>
+
+        <div id="videos-container">
+            <div id="loading" class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+            <div id="video-count" class="video-count" style="display: none;"></div>
+            <div id="video-grid" class="video-grid"></div>
+            <div id="no-videos" class="no-videos" style="display: none;">
+                <p>No unlisted videos found in your channel.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Fetch channel info and videos when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchChannelInfo();
+            fetchUnlistedVideos();
+        });
+
+        // Refresh button event listener
+        document.getElementById('refresh-btn').addEventListener('click', fetchUnlistedVideos);
+
+        // Fetch channel information
+        async function fetchChannelInfo() {
+            try {
+                const response = await fetch('/channel-info');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.channelName) {
+                        document.getElementById('channel-name').textContent = data.channelName;
+                    }
+                } else {
+                    console.error('Failed to fetch channel info');
+                }
+            } catch (error) {
+                console.error('Error fetching channel info:', error);
+            }
+        }
+
+        // Fetch unlisted videos
+        async function fetchUnlistedVideos() {
+            const statusEl = document.getElementById('status');
+            const loadingEl = document.getElementById('loading');
+            const videoCountEl = document.getElementById('video-count');
+            const videoGridEl = document.getElementById('video-grid');
+            const noVideosEl = document.getElementById('no-videos');
+
+            // Show loading
+            loadingEl.style.display = 'flex';
+            videoCountEl.style.display = 'none';
+            videoGridEl.innerHTML = '';
+            noVideosEl.style.display = 'none';
+
+            try {
+                const response = await fetch('/unlisted');
+                const data = await response.json();
+
+                // Hide loading
+                loadingEl.style.display = 'none';
+
+                if (response.ok) {
+                    if (data.videos && data.videos.length > 0) {
+                        // Show video count
+                        videoCountEl.textContent = `Found ${data.videos.length} unlisted videos`;
+                        videoCountEl.style.display = 'block';
+
+                        // Create video cards
+                        data.videos.forEach(video => {
+                            const videoCard = createVideoCard(video);
+                            videoGridEl.appendChild(videoCard);
+                        });
+                    } else {
+                        // Show no videos message
+                        noVideosEl.style.display = 'block';
+                    }
+                } else {
+                    // Show error
+                    statusEl.textContent = data.error || 'An error occurred';
+                    statusEl.className = 'status error';
+                    statusEl.style.display = 'block';
+
+                    if (data.error === 'Not authenticated. Please authenticate with Google first.') {
+                        window.location.href = '/';
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loadingEl.style.display = 'none';
+                statusEl.textContent = 'An error occurred while fetching videos.';
+                statusEl.className = 'status error';
+                statusEl.style.display = 'block';
+            }
+        }
+
+        // Create a video card element
+        function createVideoCard(video) {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-card';
+
+            // Get the best thumbnail available
+            let thumbnailUrl = 'https://via.placeholder.com/480x360?text=No+Thumbnail';
+            if (video.thumbnails) {
+                if (video.thumbnails.maxres) {
+                    thumbnailUrl = video.thumbnails.maxres.url;
+                } else if (video.thumbnails.high) {
+                    thumbnailUrl = video.thumbnails.high.url;
+                } else if (video.thumbnails.medium) {
+                    thumbnailUrl = video.thumbnails.medium.url;
+                } else if (video.thumbnails.default) {
+                    thumbnailUrl = video.thumbnails.default.url;
+                }
+            }
+
+            // Format date
+            const publishDate = new Date(video.publishedAt).toLocaleDateString();
+
+            videoCard.innerHTML = `
+                <div class="thumbnail-container">
+                    <a href="${video.url}" target="_blank">
+                        <img src="${thumbnailUrl}" alt="${video.title}" class="thumbnail">
+                    </a>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">${video.title}</div>
+                    <div class="video-meta">
+                        <span>Published: ${publishDate}</span>
+                        <span>Unlisted</span>
+                    </div>
+                    <div class="video-actions">
+                        <a href="/video.html?id=${video.id}" class="video-link">View & Comment</a>
+                        <a href="${video.url}" target="_blank" class="video-link">Watch on YouTube</a>
+                    </div>
+                </div>
+            `;
+
+            return videoCard;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video - YouTube Unlisted Videos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #c4302b;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            width: 40px;
+            margin-right: 10px;
+        }
+        h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-info a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+        .user-info a:hover {
+            text-decoration: underline;
+        }
+        main {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #555;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .video-container {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .video-embed {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-details {
+            padding: 20px;
+        }
+        .video-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .video-title h2 {
+            margin: 0;
+            flex-grow: 1;
+        }
+        .edit-button {
+            background-color: #f0f0f0;
+            border: none;
+            color: #555;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+        .edit-button:hover {
+            background-color: #e0e0e0;
+        }
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .video-description {
+            color: #333;
+            line-height: 1.6;
+            white-space: pre-line;
+            position: relative;
+        }
+        .edit-form {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        .edit-form input, .edit-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .edit-form textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .edit-form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .save-button {
+            background-color: #c4302b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .save-button:hover {
+            background-color: #a52521;
+        }
+        .cancel-button {
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .cancel-button:hover {
+            background-color: #e0e0e0;
+        }
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            display: none;
+        }
+        .comments-section {
+            margin-top: 30px;
+        }
+        .comments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .comment-form {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .comment-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 80px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        .comment-submit {
+            background-color: #c4302b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .comment-submit:hover {
+            background-color: #a52521;
+        }
+        .comments-list {
+            margin-top: 20px;
+        }
+        .comment {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .comment-author {
+            font-weight: bold;
+        }
+        .comment-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        .comment-text {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        .comment-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .reply-button {
+            background: none;
+            border: none;
+            color: #555;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0;
+        }
+        .reply-button:hover {
+            color: #c4302b;
+            text-decoration: underline;
+        }
+        .reply-form {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            padding-left: 20px;
+            border-left: 2px solid #ddd;
+            display: none;
+        }
+        .replies {
+            margin-top: 15px;
+            padding-left: 20px;
+            border-left: 2px solid #ddd;
+        }
+        .reply {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #c4302b;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-comments {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="https://www.youtube.com/s/desktop/e4d15d2c/img/favicon_144x144.png" alt="YouTube Logo" class="logo">
+            <h1>YouTube Unlisted Videos</h1>
+        </div>
+        <div class="user-info">
+            <span id="channel-name">Loading...</span>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/">Sign Out</a>
+        </div>
+    </header>
+
+    <main>
+        <a href="/dashboard" class="back-link">← Back to Dashboard</a>
+
+        <div id="video-container" class="video-container">
+            <div id="loading-video" class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <div class="comments-header">
+                <h2>Comments</h2>
+            </div>
+
+            <div class="comment-form">
+                <textarea id="comment-textarea" class="comment-textarea" placeholder="Add a comment..."></textarea>
+                <button id="comment-submit" class="comment-submit">Comment</button>
+            </div>
+
+            <div id="comments-loading" class="loading-spinner">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="comments-list" class="comments-list"></div>
+
+            <div id="no-comments" class="no-comments" style="display: none;">
+                <p>No comments yet. Be the first to comment!</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Get video ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+
+        // Store current video details
+        let currentVideo = null;
+
+        if (!videoId) {
+            window.location.href = '/dashboard';
+        }
+
+        // Show edit form
+        function showEditForm() {
+            document.getElementById('edit-form').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        // Hide edit form
+        function hideEditForm() {
+            document.getElementById('edit-form').style.display = 'none';
+        }
+
+        // Update video details
+        async function updateVideoDetails() {
+            const titleInput = document.getElementById('edit-title');
+            const descriptionInput = document.getElementById('edit-description');
+
+            const newTitle = titleInput.value.trim();
+            const newDescription = descriptionInput.value.trim();
+
+            if (!newTitle) {
+                alert('Title cannot be empty');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/videos/${videoId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        title: newTitle,
+                        description: newDescription
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Update the UI
+                    document.querySelector('.video-title h2').textContent = newTitle;
+                    document.querySelector('.video-description').textContent = newDescription || 'No description available.';
+                    document.title = `${newTitle} - YouTube Unlisted Videos`;
+
+                    // Show success message
+                    const successMessage = document.getElementById('success-message');
+                    successMessage.style.display = 'block';
+
+                    // Hide success message after 3 seconds
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+
+                    // Update current video
+                    currentVideo.title = newTitle;
+                    currentVideo.description = newDescription;
+                } else {
+                    alert(`Error updating video: ${result.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error updating video:', error);
+                alert('Error updating video. Please try again.');
+            }
+        }
+
+        // Fetch channel info and video details when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchChannelInfo();
+            fetchVideoDetails();
+            fetchComments();
+        });
+
+        // Fetch channel information
+        async function fetchChannelInfo() {
+            try {
+                const response = await fetch('/channel-info');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.channelName) {
+                        document.getElementById('channel-name').textContent = data.channelName;
+                    }
+                } else {
+                    console.error('Failed to fetch channel info');
+                }
+            } catch (error) {
+                console.error('Error fetching channel info:', error);
+            }
+        }
+
+        // Fetch video details
+        async function fetchVideoDetails() {
+            const videoContainer = document.getElementById('video-container');
+            const loadingVideo = document.getElementById('loading-video');
+
+            try {
+                const response = await fetch(`/unlisted`);
+                const data = await response.json();
+
+                loadingVideo.style.display = 'none';
+
+                if (response.ok && data.videos) {
+                    const video = data.videos.find(v => v.id === videoId);
+
+                    if (video) {
+                        // Store current video for later use
+                        currentVideo = video;
+                        // Format date
+                        const publishDate = new Date(video.publishedAt).toLocaleDateString();
+
+                        // Create video embed and details
+                        videoContainer.innerHTML = `
+                            <div class="video-embed">
+                                <iframe src="https://www.youtube.com/embed/${video.id}" allowfullscreen></iframe>
+                            </div>
+                            <div class="video-details">
+                                <div class="video-title">
+                                    <h2>${video.title}</h2>
+                                    <button class="edit-button" onclick="showEditForm()">Edit Video</button>
+                                </div>
+                                <div class="video-meta">
+                                    <span>Published: ${publishDate}</span>
+                                    <span>Unlisted</span>
+                                </div>
+                                <div class="video-description">${video.description || 'No description available.'}</div>
+
+                                <div id="edit-form" class="edit-form">
+                                    <h3>Edit Video Details</h3>
+                                    <input type="text" id="edit-title" value="${video.title}" placeholder="Video title">
+                                    <textarea id="edit-description" placeholder="Video description">${video.description || ''}</textarea>
+                                    <div class="edit-form-buttons">
+                                        <button class="cancel-button" onclick="hideEditForm()">Cancel</button>
+                                        <button class="save-button" onclick="updateVideoDetails()">Save Changes</button>
+                                    </div>
+                                    <div id="success-message" class="success-message">Video details updated successfully!</div>
+                                </div>
+                            </div>
+                        `;
+
+                        // Update page title
+                        document.title = `${video.title} - YouTube Unlisted Videos`;
+                    } else {
+                        videoContainer.innerHTML = `
+                            <div class="video-details">
+                                <h2 class="video-title">Video not found</h2>
+                                <p>The requested video could not be found.</p>
+                            </div>
+                        `;
+                    }
+                } else {
+                    videoContainer.innerHTML = `
+                        <div class="video-details">
+                            <h2 class="video-title">Error loading video</h2>
+                            <p>${data.error || 'An error occurred while loading the video.'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loadingVideo.style.display = 'none';
+                videoContainer.innerHTML = `
+                    <div class="video-details">
+                        <h2 class="video-title">Error loading video</h2>
+                        <p>An error occurred while loading the video.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Fetch comments for the video
+        async function fetchComments() {
+            const commentsLoading = document.getElementById('comments-loading');
+            const commentsList = document.getElementById('comments-list');
+            const noComments = document.getElementById('no-comments');
+
+            try {
+                const response = await fetch(`/api/comments/${videoId}`);
+                const comments = await response.json();
+
+                commentsLoading.style.display = 'none';
+
+                if (response.ok) {
+                    if (comments.length > 0) {
+                        commentsList.innerHTML = '';
+                        comments.forEach(comment => {
+                            const commentElement = createCommentElement(comment);
+                            commentsList.appendChild(commentElement);
+                        });
+                    } else {
+                        noComments.style.display = 'block';
+                    }
+                } else {
+                    commentsList.innerHTML = `<p>Error loading comments: ${comments.error || 'Unknown error'}</p>`;
+                }
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+                commentsLoading.style.display = 'none';
+                commentsList.innerHTML = `<p>Error loading comments</p>`;
+            }
+        }
+
+        // Create a comment element
+        function createCommentElement(comment) {
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment';
+            commentDiv.dataset.id = comment._id;
+
+            // Format date
+            const commentDate = new Date(comment.createdAt).toLocaleDateString();
+
+            // Create comment HTML
+            commentDiv.innerHTML = `
+                <div class="comment-header">
+                    <div class="comment-author">${comment.author}</div>
+                    <div class="comment-date">${commentDate}</div>
+                </div>
+                <div class="comment-text">${comment.text}</div>
+                <div class="comment-actions">
+                    <button class="reply-button" onclick="toggleReplyForm('${comment._id}')">Reply</button>
+                </div>
+                <div id="reply-form-${comment._id}" class="reply-form">
+                    <textarea id="reply-textarea-${comment._id}" class="comment-textarea" placeholder="Add a reply..."></textarea>
+                    <button class="comment-submit" onclick="submitReply('${comment._id}')">Reply</button>
+                </div>
+                <div class="replies">
+                    ${comment.replies.map(reply => {
+                        const replyDate = new Date(reply.createdAt).toLocaleDateString();
+                        return `
+                            <div class="reply">
+                                <div class="comment-header">
+                                    <div class="comment-author">${reply.author}</div>
+                                    <div class="comment-date">${replyDate}</div>
+                                </div>
+                                <div class="comment-text">${reply.text}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            return commentDiv;
+        }
+
+        // Toggle reply form visibility
+        function toggleReplyForm(commentId) {
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            if (replyForm.style.display === 'block') {
+                replyForm.style.display = 'none';
+            } else {
+                replyForm.style.display = 'block';
+            }
+        }
+
+        // Submit a new comment
+        document.getElementById('comment-submit').addEventListener('click', async () => {
+            const textarea = document.getElementById('comment-textarea');
+            const text = textarea.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/comments', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        videoId,
+                        text
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Clear textarea
+                    textarea.value = '';
+
+                    // Hide no comments message if visible
+                    document.getElementById('no-comments').style.display = 'none';
+
+                    // Add new comment to the list
+                    const commentElement = createCommentElement(result);
+                    document.getElementById('comments-list').prepend(commentElement);
+                } else {
+                    alert(`Error adding comment: ${result.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error adding comment:', error);
+                alert('Error adding comment. Please try again.');
+            }
+        });
+
+        // Submit a reply to a comment
+        async function submitReply(commentId) {
+            const textarea = document.getElementById(`reply-textarea-${commentId}`);
+            const text = textarea.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/comments/${commentId}/replies`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Clear textarea and hide form
+                    textarea.value = '';
+                    document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+
+                    // Refresh comments to show the new reply
+                    fetchComments();
+                } else {
+                    alert(`Error adding reply: ${result.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                console.error('Error adding reply:', error);
+                alert('Error adding reply. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
